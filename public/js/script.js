@@ -29,7 +29,7 @@ function formatearFecha(timestamp) {
 
 async function fetchStatus() {
     try {
-        const response = await fetch('status.json?t=' + new Date().getTime());
+        const response = await fetch('../json/status.json?t=' + new Date().getTime());
         const data = await response.json();
         renderDashboard(data);
     } catch (error) {
