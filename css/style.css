@@ -1,0 +1,50 @@
+body, html { 
+    height: 100vh; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; 
+    background-color: #1e1e2e; 
+    font-family: 'Segoe UI', sans-serif;
+    color: #cdd6f4;
+}
+
+#dashboard {
+    height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+    /* Una sola grilla para todos los equipos */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-auto-rows: min-content;
+    gap: 10px;
+    overflow-y: auto; /* Si son demasiados, el scroll es solo vertical */
+}
+
+/* Tarjeta base */
+.host-card { 
+    padding: 10px; 
+    border-radius: 6px; 
+    color: #11111b; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    /* El borde izquierdo será el indicador del grupo */
+    border-left: 8px solid transparent; 
+    background-color: #313244; /* Fondo oscuro por defecto */
+    transition: transform 0.1s ease;
+}
+
+.host-card:hover { transform: scale(1.02); }
+
+.host-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; }
+.host-time { font-size: 0.75rem; opacity: 0.8; font-weight: 600; }
+
+/* Estados de respuesta (el fondo cambia según el ping) */
+.status-verde { background-color: #a6e3a1; }
+.status-amarillo { background-color: #f9e2af; }
+.status-rojo { background-color: #f38ba8; color: white; }
+
+/* Scrollbar estética */
+#dashboard::-webkit-scrollbar { width: 6px; }
+#dashboard::-webkit-scrollbar-thumb { background: #45475a; border-radius: 10px; }
