@@ -36,7 +36,7 @@ function formatearFecha(timestamp) {
 
 async function fetchStatus() {
     try {
-        const response = await fetch('status.json?t=' + Date.now());
+        const response = await fetch('/json/status.json?t=' + Date.now());
         const data = await response.json();
         
         data.sort((a, b) => {
