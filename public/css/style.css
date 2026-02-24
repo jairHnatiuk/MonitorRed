@@ -1,50 +1,81 @@
 body, html { 
     height: 100vh; 
+    width: 100vw;
     margin: 0; 
     padding: 0; 
     overflow: hidden; 
-    background-color: #1e1e2e; 
-    font-family: 'Segoe UI', sans-serif;
-    color: #cdd6f4;
+    background-color: #0a0a0c; /* Fondo casi negro para resaltar los botones */
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    cursor: none;
 }
 
 #dashboard {
-    height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    width: 100%;
+    height: 100%;
     padding: 10px;
-    box-sizing: border-box;
-    /* Una sola grilla para todos los equipos */
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    grid-auto-rows: min-content;
     gap: 10px;
-    overflow-y: auto; /* Si son demasiados, el scroll es solo vertical */
+    box-sizing: border-box;
 }
 
-/* Tarjeta base */
 .host-card { 
-    padding: 10px; 
-    border-radius: 6px; 
-    color: #11111b; 
-    text-align: center; 
+    flex: 1 1 250px; 
     display: flex; 
     flex-direction: column; 
-    justify-content: center;
-    /* El borde izquierdo será el indicador del grupo */
-    border-left: 8px solid transparent; 
-    background-color: #313244; /* Fondo oscuro por defecto */
-    transition: transform 0.1s ease;
+    justify-content: center; 
+    align-items: center;
+    border-radius: 8px; 
+    border-left: 18px solid transparent; 
+    background-color: #1e1e26; 
+    color: #ffffff;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 15px;
+    transition: all 0.3s ease;
+    /* Agregamos esta sombra interna suave para separar el borde del cuerpo */
+    box-shadow: inset 5px 0 10px rgba(0,0,0,0.3); 
+    min-height: 70px;
 }
 
-.host-card:hover { transform: scale(1.02); }
+.host-name { 
+    font-weight: 800; 
+    font-size: clamp(1.1rem, 2.3vmin, 2.8rem); 
+    line-height: 1.1;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+}
 
-.host-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; }
-.host-time { font-size: 0.75rem; opacity: 0.8; font-weight: 600; }
+.host-time { 
+    font-size: clamp(0.8rem, 1.4vmin, 1.6rem); 
+    opacity: 0.9; 
+    font-weight: 400;
+    font-family: 'Courier New', monospace; /* Estilo digital para la hora */
+}
 
-/* Estados de respuesta (el fondo cambia según el ping) */
-.status-verde { background-color: #a6e3a1; }
-.status-amarillo { background-color: #f9e2af; }
-.status-rojo { background-color: #f38ba8; color: white; }
+/* === NUEVA PALETA DE COLORES PROFESIONAL === */
 
-/* Scrollbar estética */
-#dashboard::-webkit-scrollbar { width: 6px; }
-#dashboard::-webkit-scrollbar-thumb { background: #45475a; border-radius: 10px; }
+.status-verde { 
+    background-color: #1b5e20; /* Verde Bosque profundo */
+    border-top: 1px solid #2e7d32;
+}
+
+.status-amarillo { 
+    background-color: #b8860b; /* Ámbar / Oro viejo */
+    color: #ffffff;
+}
+
+.status-rojo { 
+    background-color: #8b0000; /* Rojo sangre oscuro (menos agresivo) */
+    color: #ffffff;
+    animation: pulse-red 2s infinite ease-in-out;
+}
+
+/* Animación de pulso más suave para no lastimar los ojos */
+@keyframes pulse-red {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.4); box-shadow: inset 0 0 20px rgba(255,0,0,0.3); }
+    100% { filter: brightness(1); }
+}

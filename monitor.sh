@@ -78,5 +78,5 @@ while true; do
     echo "$JSON" > "$JSON_FILE.tmp"
     mv "$JSON_FILE.tmp" "$JSON_FILE"
 
-    sleep 2
+    sleep 4
 done

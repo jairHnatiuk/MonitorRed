@@ -1,73 +1,74 @@
-// Paleta de colores para los bordes de los grupos
-const coloresGrupos = [
-    '#89b4fa', '#f5c2e7', '#fab387', '#94e2d5', 
-    '#cba6f7', '#f9e2af', '#a6e3a1', '#eba0ac'
+// Paleta "Industrial Dark": Tonos oscuros, elegantes y profesionales
+const coloresBordes = [
+    '#1c2b46', // Azul Naval Profundo
+    '#2d2d2d', // Grafito / Carbono
+    '#3e2723', // Marrón Café Oscuro
+    '#263238', // Pizarra Azulado
+    '#311b92', // Índigo Profundo
+    '#1b5e20', // Bosque Seco (Oscuro)
+    '#4a148c', // Púrpura Imperial
+    '#37474f'  // Acero Grisáceo
 ];
-const mapaColores = {}; 
-let colorIndex = 0;
 
-function obtenerColorGrupo(nombreGrupo) {
-    if (!mapaColores[nombreGrupo]) {
-        mapaColores[nombreGrupo] = coloresGrupos[colorIndex % coloresGrupos.length];
-        colorIndex++;
+const mapaColores = {}; 
+let colorIdx = 0;
+
+function obtenerColor(grupo) {
+    if (!mapaColores[grupo]) {
+        mapaColores[grupo] = coloresBordes[colorIdx % coloresBordes.length];
+        colorIdx++;
     }
-    return mapaColores[nombreGrupo];
+    return mapaColores[grupo];
 }
 
 function formatearFecha(timestamp) {
-    if (timestamp === 0) return "nunca";
-    const fechaHost = new Date(timestamp * 1000);
+    if (timestamp === 0) return "--:--:--";
+    const fecha = new Date(timestamp * 1000);
     const hoy = new Date();
-    const esHoy = fechaHost.toDateString() === hoy.toDateString();
+    const esHoy = fecha.toDateString() === hoy.toDateString();
 
-    const horaStr = fechaHost.toLocaleTimeString('es-AR', { 
+    const hora = fecha.toLocaleTimeString('es-AR', { 
         hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
     });
 
-    return esHoy ? horaStr : `${fechaHost.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'})} ${horaStr}`;
+    return esHoy ? hora : `${fecha.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'})} ${hora}`;
 }
 
 async function fetchStatus() {
     try {
-        const response = await fetch('../json/status.json?t=' + new Date().getTime());
+        const response = await fetch('status.json?t=' + Date.now());
         const data = await response.json();
-        renderDashboard(data);
-    } catch (error) {
-        console.error("Error:", error);
-    }
+        
+        data.sort((a, b) => {
+            if (a.grupo !== b.grupo) return a.grupo.localeCompare(b.grupo);
+            return a.nombre.localeCompare(b.nombre);
+        });
+
+        render(data);
+    } catch (e) { console.error("Error cargando JSON", e); }
 }
 
-function renderDashboard(data) {
-    const dashboard = document.getElementById('dashboard');
-    dashboard.innerHTML = '';
+function render(data) {
+    const dash = document.getElementById('dashboard');
+    dash.innerHTML = '';
 
-    // Ordenar: primero por GRUPO, luego por NOMBRE
-    data.sort((a, b) => {
-        if (a.grupo < b.grupo) return -1;
-        if (a.grupo > b.grupo) return 1;
-        return a.nombre.localeCompare(b.nombre);
-    });
-
-    data.forEach(host => {
+    data.forEach(h => {
         const card = document.createElement('div');
-        const octetos = host.ip.split('.');
-        const ipCorta = octetos.length === 4 ? `${octetos[2]}.${octetos[3]}` : host.ip;
-        
-        // Asignar color de borde según el grupo
-        const colorBorde = obtenerColorGrupo(host.grupo);
-        card.style.borderLeftColor = colorBorde;
+        const ipSplit = h.ip.split('.');
+        const ipCorta = `${ipSplit[2]}.${ipSplit[3]}`;
 
+        card.style.borderLeftColor = obtenerColor(h.grupo);
+        
         card.innerHTML = `
-            <div class="host-name">${host.nombre} (${ipCorta})</div>
-            <div class="host-time">${formatearFecha(host.last_seen)}</div>
+            <div class="host-name">${h.nombre}</div>
+            <div class="host-time">${ipCorta} | ${formatearFecha(h.last_seen)}</div>
         `;
 
-        // Color de fondo según estado
-        if (host.missed === 0) card.className = 'host-card status-verde';
-        else if (host.missed < 10) card.className = 'host-card status-amarillo';
+        if (h.missed === 0) card.className = 'host-card status-verde';
+        else if (h.missed < 10) card.className = 'host-card status-amarillo';
         else card.className = 'host-card status-rojo';
 
-        dashboard.appendChild(card);
+        dash.appendChild(card);
     });
 }
 
