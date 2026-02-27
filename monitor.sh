@@ -8,6 +8,12 @@ declare -A missed_count
 declare -A host_name
 declare -A host_group
 declare -A last_seen # Nuevo diccionario para el timestamp
+# === VARIABLES DE TIEMPO EN EL SCRIPT BASH ===
+TIMEOUT_SEGUNDOS=1  # Cuánto tiempo esperar cada respuesta individual
+INTERVALO_CICLO=3   # Cuánto tiempo esperar entre rondas de pings
+
+# Ejemplo de cómo debería ir el comando dentro de tu función de ping:
+
 
 while IFS=',' read -r ip name group || [ -n "$ip" ]; do
     [[ -z "$ip" || "$ip" == \#* ]] && continue
@@ -35,7 +41,8 @@ while true; do
     # Lanzar pings
     for ip in "${!host_name[@]}"; do
         (
-            if ping -c 1 -W 1 "$ip" > /dev/null 2>&1; then
+            #if ping -c 1 -W 1 "$ip" > /dev/null 2>&1; then
+            if ping -c 1 -W $TIMEOUT_SEGUNDOS "$ip" > /dev/null 2>&1; then
                 echo 0 > "$TMP_DIR/$ip"
             else
                 echo 1 > "$TMP_DIR/$ip"

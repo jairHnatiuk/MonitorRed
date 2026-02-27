@@ -10,6 +10,42 @@ const coloresBordes = [
     '#37474f'  // Acero Grisáceo
 ];
 
+// === PARAMETRIZACIÓN DE ALERTAS ===
+const PINGS_PARA_WARNING = 1; // Al primer ping perdido se pone amarillo
+const PINGS_PARA_ERROR   = 5; // A los 5 pings perdidos se pone rojo
+
+
+function render(data) {
+    const dash = document.getElementById('dashboard');
+    dash.innerHTML = '';
+
+    data.forEach(h => {
+        const card = document.createElement('div');
+        const ipSplit = h.ip.split('.');
+        const ipCorta = `${ipSplit[2]}.${ipSplit[3]}`;
+
+        card.style.borderLeftColor = obtenerColor(h.grupo);
+        
+        card.innerHTML = `
+            <div class="host-name">${h.nombre}</div>
+            <div class="host-time">${ipCorta} | ${formatearFecha(h.last_seen)}</div>
+        `;
+
+        // Lógica de colores parametrizada
+        if (h.missed === 0) {
+            card.className = 'host-card status-verde';
+        } else if (h.missed < PINGS_PARA_ERROR) {
+            // Si hay fallos pero no llegamos al error total
+            card.className = 'host-card status-amarillo';
+        } else {
+            // Si superamos el umbral de error
+            card.className = 'host-card status-rojo';
+        }
+
+        dash.appendChild(card);
+    });
+}
+
 const mapaColores = {}; 
 let colorIdx = 0;
 
@@ -48,29 +84,6 @@ async function fetchStatus() {
     } catch (e) { console.error("Error cargando JSON", e); }
 }
 
-function render(data) {
-    const dash = document.getElementById('dashboard');
-    dash.innerHTML = '';
-
-    data.forEach(h => {
-        const card = document.createElement('div');
-        const ipSplit = h.ip.split('.');
-        const ipCorta = `${ipSplit[2]}.${ipSplit[3]}`;
-
-        card.style.borderLeftColor = obtenerColor(h.grupo);
-        
-        card.innerHTML = `
-            <div class="host-name">${h.nombre}</div>
-            <div class="host-time">${ipCorta} | ${formatearFecha(h.last_seen)}</div>
-        `;
-
-        if (h.missed === 0) card.className = 'host-card status-verde';
-        else if (h.missed < 10) card.className = 'host-card status-amarillo';
-        else card.className = 'host-card status-rojo';
-
-        dash.appendChild(card);
-    });
-}
 
 fetchStatus();
 setInterval(fetchStatus, 3000);
