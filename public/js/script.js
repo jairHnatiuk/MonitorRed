@@ -1,25 +1,68 @@
 import { showHistoryModal } from './modal.js';
-import { aplicarLayout, iniciarBotonLayout } from './layout.js';
 
 // =============================================
 // PALETA DE COLORES POR GRUPO
 // =============================================
 const COLORES_BORDE = [
-    '#1c2b46', // Azul Naval
-    '#2d2d2d', // Grafito
-    '#3e2723', // Marrón Café
-    '#263238', // Pizarra
-    '#311b92', // Índigo
-    '#1b5e20', // Bosque
-    '#4a148c', // Púrpura
-    '#37474f', // Acero
+    '#1c2b46',
+    '#2d2d2d',
+    '#3e2723',
+    '#263238',
+    '#311b92',
+    '#1b5e20',
+    '#4a148c',
+    '#37474f',
 ];
 
 let META = { warning: 1, error: 5 };
 
 const mapaColores = {};
-let colorIdx  = 0;
-let lastHosts = [];   // caché para redibujar sin re-fetch al cambiar layout
+let colorIdx = 0;
+
+// =============================================
+// TAMAÑO DE FUENTE — cookie
+// =============================================
+const FS_MIN  = 0.6;
+const FS_MAX  = 1.8;
+const FS_STEP = 0.1;
+const FS_DEFAULT = 1.0;
+
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? parseFloat(decodeURIComponent(match[1])) : null;
+}
+
+function setCookie(name, value) {
+    const exp = new Date();
+    exp.setFullYear(exp.getFullYear() + 2);
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${exp.toUTCString()}; path=/; SameSite=Lax`;
+}
+
+let fontScale = getCookie('fontScale') ?? FS_DEFAULT;
+
+function applyFontScale(scale) {
+    fontScale = Math.round(Math.max(FS_MIN, Math.min(FS_MAX, scale)) * 100) / 100;
+    document.documentElement.style.setProperty('--fs', fontScale);
+    setCookie('fontScale', fontScale);
+    const label = document.getElementById('font-size-label');
+    if (label) label.textContent = Math.round(fontScale * 100) + '%';
+}
+
+function initFontControls() {
+    const ctrl = document.createElement('div');
+    ctrl.id = 'font-controls';
+    ctrl.innerHTML = `
+        <button id="fs-minus" title="Reducir texto">−</button>
+        <span id="font-size-label"></span>
+        <button id="fs-plus"  title="Agrandar texto">+</button>
+    `;
+    document.body.appendChild(ctrl);
+
+    document.getElementById('fs-minus').addEventListener('click', () => applyFontScale(fontScale - FS_STEP));
+    document.getElementById('fs-plus' ).addEventListener('click', () => applyFontScale(fontScale + FS_STEP));
+
+    applyFontScale(fontScale); // aplica valor inicial y actualiza label
+}
 
 // =============================================
 // RENDER
@@ -35,7 +78,8 @@ function render(hosts) {
         card.style.borderLeftColor = obtenerColorGrupo(h.grupo);
         card.innerHTML = `
             <div class="host-name">${h.nombre}</div>
-            <div class="host-time">${c}.${d} | ${formatearFecha(h.last_seen)}</div>
+            <div class="host-ip">${h.ip}</div>
+            <div class="host-time">${formatearFecha(h.last_seen)}</div>
         `;
 
         if (h.missed < META.warning) {
@@ -49,8 +93,6 @@ function render(hosts) {
         card.addEventListener('click', () => showHistoryModal(h));
         dash.appendChild(card);
     });
-
-    aplicarLayout(dash, hosts.length);
 }
 
 // =============================================
@@ -82,28 +124,17 @@ async function fetchStatus() {
 
         if (json.meta) META = json.meta;
 
-        lastHosts = (json.hosts ?? json).sort((a, b) => {
+        const hosts = (json.hosts ?? json).sort((a, b) => {
             const g = a.grupo.localeCompare(b.grupo);
             return g !== 0 ? g : a.nombre.localeCompare(b.nombre);
         });
 
-        render(lastHosts);
+        render(hosts);
     } catch (e) {
         console.error('Error cargando status.json:', e);
     }
 }
 
-// =============================================
-// INIT
-// =============================================
-
-// El botón llama a render con los datos en caché → sin re-fetch
-iniciarBotonLayout(() => render(lastHosts));
-
-// Recalcular layout si cambia el tamaño de la ventana
-window.addEventListener('resize', () => {
-    if (lastHosts.length) render(lastHosts);
-});
-
+initFontControls();
 fetchStatus();
 setInterval(fetchStatus, 3000);
