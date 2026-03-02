@@ -100,6 +100,8 @@ function applyGrid(n) {
     const dash = document.getElementById('dashboard');
     const { cols, rows } = calcGrid(n);
     dash.style.display             = 'grid';
+    dash.style.gap                 = GAP + 'px';   // ← agregar
+    dash.style.padding             = PAD + 'px';   // ← agregar
     dash.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     dash.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
 }

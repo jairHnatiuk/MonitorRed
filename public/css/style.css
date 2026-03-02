@@ -24,7 +24,6 @@ body, html {
 }
 
 .host-card {
-    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -39,6 +38,10 @@ body, html {
     transition: all 0.3s ease;
     box-shadow: inset 5px 0 10px rgba(0,0,0,0.3);
     cursor: pointer;
+    /* Crítico: impide que el contenido expanda la celda más allá del grid */
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .host-card:hover {
