@@ -1,0 +1,37 @@
+192.168.10.2,DNS Umbrella,Sistemas
+192.168.10.22,DNS Umbrella 2,Sistemas
+192.168.99.50,Controladora Aruba,Redes
+192.168.99.39,AP Gerencia,Redes
+192.168.99.52,AP Congelado,Redes
+192.168.99.53,AP Camara 1, 2 y 3,Redes
+192.168.99.55,AP Ingreso de Despostada ,Redes
+192.168.99.59,AP Cuarteo,Redes
+192.168.99.61,AP Sistemas,Redes
+192.168.99.62,AP Calidad,Redes
+192.168.99.27,Switch Faena,Redes
+192.168.10.7,C.E.F,Sistemas
+192.168.22.15,Balanza de Martillo
+192.168.99.23,Switch Oficina Supervisores,Redes
+192.168.99.84,Switch Ingreso Despostada,Redes
+192.168.99.82,Switch Emp pri(Aruba),Redes
+192.168.99.22,Switch Empaque primario,Redes
+192.168.99.20,Switch Empaque Sec,Redes
+192.168.99.80,Switch Cuarteo,Redes
+192.168.99.21,Switch Congelado,Redes
+192.168.99.28,Switch Calidad,Redes
+192.168.99.24,Switch Calidad 2,Redes
+192.168.99.33,Switch Gerencia,Redes
+192.168.99.17,Switch Sala de Maquinas,Redes
+192.168.99.34,Switch Mikrotik Corrales,Redes
+192.168.99.83,Switch Túnel 15 ,Redes
+192.168.99.81,Switch Balanza,Redes
+192.168.99.41,Switch Administracion,Redes
+192.168.99.42,Switch Mantenimiento 2960,Redes
+192.168.99.40,SwitchNodo,Redes
+192.168.99.31,Switch 9200 Sistemas,Redes
+192.168.99.25,Switch Sistemas 2 (2960XR),Redes
+192.168.13.14,Server telefonia,Sistemas
+192.168.99.5,Server virtuales nuevo,Sistemas
+192.168.99.6,Server virtuales viejo,Sistemas
+192.168.10.20,Server Twins/Physis,Sistemas
+192.168.99.12,UPS 6000,Hardware

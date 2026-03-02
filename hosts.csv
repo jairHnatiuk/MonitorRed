@@ -1,37 +1,119 @@
-192.168.10.2,DNS Umbrella,Sistemas
-192.168.10.22,DNS Umbrella 2,Sistemas
-192.168.99.50,Controladora Aruba,Redes
-192.168.99.39,AP Gerencia,Redes
-192.168.99.52,AP Congelado,Redes
-192.168.99.53,AP Camara 1, 2 y 3,Redes
-192.168.99.55,AP Ingreso de Despostada ,Redes
-192.168.99.59,AP Cuarteo,Redes
-192.168.99.61,AP Sistemas,Redes
-192.168.99.62,AP Calidad,Redes
-192.168.99.27,Switch Faena,Redes
-192.168.10.7,C.E.F,Sistemas
-192.168.22.15,Balanza de Martillo
-192.168.99.23,Switch Oficina Supervisores,Redes
-192.168.99.84,Switch Ingreso Despostada,Redes
-192.168.99.82,Switch Emp pri(Aruba),Redes
-192.168.99.22,Switch Empaque primario,Redes
-192.168.99.20,Switch Empaque Sec,Redes
-192.168.99.80,Switch Cuarteo,Redes
-192.168.99.21,Switch Congelado,Redes
-192.168.99.28,Switch Calidad,Redes
-192.168.99.24,Switch Calidad 2,Redes
-192.168.99.33,Switch Gerencia,Redes
-192.168.99.17,Switch Sala de Maquinas,Redes
-192.168.99.34,Switch Mikrotik Corrales,Redes
-192.168.99.83,Switch Túnel 15 ,Redes
-192.168.99.81,Switch Balanza,Redes
-192.168.99.41,Switch Administracion,Redes
-192.168.99.42,Switch Mantenimiento 2960,Redes
-192.168.99.40,SwitchNodo,Redes
-192.168.99.31,Switch 9200 Sistemas,Redes
-192.168.99.25,Switch Sistemas 2 (2960XR),Redes
-192.168.13.14,Server telefonia,Sistemas
-192.168.99.5,Server virtuales nuevo,Sistemas
-192.168.99.6,Server virtuales viejo,Sistemas
-192.168.10.20,Server Twins/Physis,Sistemas
-192.168.99.12,UPS 6000,Hardware
+192.168.97.30,FIERRO30,Sistemas
+192.168.97.31,FIERRO31,Sistemas
+192.168.97.32,FIERRO32,Sistemas
+192.168.97.36,STOREONCE,Sistemas
+192.168.97.37,FIERRO37,Sistemas
+192.168.1.5,srvtwins Servidor Twins,Sistemas
+192.168.1.64,Srvlinea1 Linea 1 Bizerba,Sistemas
+192.168.1.51,Panel Linea 1 Bizerba,Sistemas
+192.168.1.52,Impresora Linea 1 Bizerba,Sistemas
+192.168.1.65,Srvlinea2 Linea 2 Bizerba,Sistemas
+192.168.1.48,Impresora Linea 2 Bizerba,Sistemas
+192.168.1.49,Panel Linea 2 Bizerba,Sistemas
+192.168.1.66,Srvlinea3 Linea 3 Bizerbav
+192.168.1.46,Impresora Linea 3 Bizerba,Sistemas
+192.168.1.47,Panel Linea 3 Bizerba,Sistemas
+192.168.1.53,Bizerba Produ,Sistemas
+192.168.1.54,Bizerba produ panel,Sistemas
+192.168.1.3,Torrente Armado de Cajas,Sistemas
+192.168.1.100,Virtual Ketan,Sistemas
+192.168.39.135,VideoJet Despostada,Sistemas
+192.168.1.194,Tata (twins super),Sistemas
+192.168.6.24,Twinsrf (archivos colector),Sistemas
+192.168.1.4,Servidor Cassioli 1,Sistemas
+192.168.1.8,Servidor Cassioli 2,Sistemas
+192.168.1.7,Drewolf,Sistemas
+192.168.1.26,Metabase,Sistemas
+192.168.97.125,Foro,Sistemas
+192.168.1.9,Tchala (InwWeb),Sistemas
+192.168.1.6, Robinnew(SOFTLAND),Sistemas
+192.168.1.16,win-file-pro-01 (FILESERVER),Sistemas
+192.168.1.21,SIFAB,Sistemas
+192.168.97.4,StorageIBM,Sistemas
+192.168.97.5,IBM Insight,Sistemas
+192.168.230.10,CROSETTO PLC,Sistemas
+192.168.9.170,PLC ASUAN-CROSETTO (LADO ASUAN),Sistemas
+192.168.1.240,scada-trv (Carton Freezzer),Sistemas
+192.168.76.99,frioserver (scada sala maq),Sistemas
+192.168.40.51,PLC Deza,Sistemas
+192.168.9.50,Scada Asuan,Sistemas
+192.168.97.18,PAÑOL,Otro
+192.168.97.19,CONGELADOS,Otro
+192.168.97.20,FIBRA,Otro
+192.168.97.21,SISTEMAS,Otro
+192.168.97.22,SISTEMAS,Otro
+192.168.97.23,CALLE BALANZA,Otro
+192.168.97.24,OFICINA HIELO,Otro
+192.168.97.25,LOGISTICA,Otro
+192.168.97.27,REMANEJO,Otro
+192.168.97.28,INSUMOS,Otro
+192.168.97.29,DESPOSTADA,Otro
+192.168.97.119,DEP.INT.CUARTO,Otro
+192.168.97.120,DEP.INT.ESCALERA,Otro
+192.168.97.121,CALIDAD,Otro
+192.168.97.122,DEP:INT. ENTRETECHO,Otro
+192.168.97.123,EFLUENTES,Otro
+192.168.97.124,EFLUENTESOFI,Otro
+192.168.97.126,VIGILANCIA,Otro
+192.168.1.1,Capa 3 (Aruba),Otro
+192.168.1.254,pfSense,Otro
+192.168.1.13,CIRCUTOR MEDIA TENSION,Otro
+200.5.110.122,Internet principal,Otro
+192.168.1.22,win-ad-pro-13(DHCP/DNS,Otro
+192.168.1.23,win-ad-pro-10(DHCP/DNS)BKP,Otro
+192.168.1.11,UMBRELLA (DNS),Otro
+192.168.1.12,UMBRELLA2 (DNS),Otro
+192.168.3.10,TELEFONIA ISSABEL,Otro
+192.168.4.252,Fision (HikCentral),Otro
+192.168.4.254,Biclope (HikCentral grabaciones),Otro
+192.168.32.61,Ketan 61 L1,Impresora
+192.168.32.62,Ketan 62 L1,Impresora
+192.168.32.63,Ketan 63 L2,Impresora
+192.168.32.64,Ketan 64 L2,Impresora
+192.168.32.65,Ketan 65 L3,Impresora
+192.168.32.68,Ketan 68 L3,Impresora
+192.168.32.71,Ketan 71 L4,Impresora
+192.168.32.73,Ketan 73 L4,Impresora
+192.168.32.70,Etiq.Manual,Impresora
+192.168.1.133,Pc Armado Cajas,Impresora
+192.168.4.4,CALLE BALANZA,DVR
+192.168.4.5,REMANEJO,DVR
+192.168.4.6,CONGELADOS,DVR
+192.168.4.7,SALA MAQ HIELO,DVR
+192.168.4.8,INSUMOS 1,DVR
+192.168.4.9,OFICINA HIELO,DVR
+192.168.4.10,PASILLO,DVR
+192.168.4.11,GERENCIA,DVR
+192.168.4.12,PAÑOL,DVR
+192.168.4.14,DESPOSTADA,DVR
+192.168.4.16,INSUMOS 2,DVR
+192.168.4.21,DESCARGA (RACK INSUMOS),DVR
+192.168.4.23,DESPOSTADA/SUPER,DVR
+192.168.4.24,NVR Of.Hielo,DVR
+192.168.97.219,- Controladora,APs
+192.168.97.218,1 Vigilancia,APs
+192.168.97.220,2 Sala Maquinas,APs
+192.168.97.221,3 Ofi-Insumos,APs
+192.168.97.222,4 Ofi.Frescos,APs
+192.168.97.223,5 Mantenimiento oficina,APs
+192.168.97.224,6 Gerencia,APs
+192.168.97.225,7 Pañol,APs
+192.168.97.226,8 Rack.Dep.Int.,APs
+192.168.97.227,9 Despostada,APs
+192.168.97.228,10 Produccion,APs
+192.168.97.229,11 Remanejo,APs
+192.168.97.230,12 Congelados,APs
+192.168.97.232,13 Dep.Inteligente,APs
+192.168.97.233,14 Efluentes,APs
+192.168.97.234,15 Calidad,APs
+192.168.97.236,16 Oficina Hielo,APs
+192.168.97.237,17 Pasillo Enfermeria,APs
+192.168.97.238,18 Chalet,APs
+192.168.97.239,19 Sala Maquinas Hielo,APs
+192.168.97.240,20 Logistica,APs
+192.168.97.241,21 Compras,APs
+192.168.97.243,22 Sistemas/Pasillo 515,APs
+192.168.97.235,23 Supermercado Produ,APs
+
+
+

@@ -1,0 +1,25 @@
+192.168.97.219;- Controladora
+192.168.97.218;1 Vigilancia 
+192.168.97.220;2 Sala Maquinas
+192.168.97.221;3 Ofi-Insumos
+192.168.97.222;4 Ofi.Frescos
+192.168.97.223;5 Mantenimiento oficina
+192.168.97.224;6 Gerencia
+192.168.97.225;7 Pañol
+192.168.97.226;8 Rack.Dep.Int.
+192.168.97.227;9 Despostada
+192.168.97.228;10 Produccion
+192.168.97.229;11 Remanejo
+192.168.97.230;12 Congelados
+192.168.97.232;13 Dep.Inteligente
+192.168.97.233;14 Efluentes
+192.168.97.234;15 Calidad
+192.168.97.236;16 Oficina Hielo
+192.168.97.237;17 Pasillo Enfermeria
+192.168.97.238;18 Chalet
+192.168.97.239;19 Sala Maquinas Hielo
+192.168.97.240;20 Logistica
+192.168.97.241;21 Compras
+192.168.97.243;22 Sistemas/Pasillo 515
+192.168.97.235;23 Supermercado Produ
+

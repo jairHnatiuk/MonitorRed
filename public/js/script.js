@@ -1,89 +1,96 @@
-// Paleta "Industrial Dark": Tonos oscuros, elegantes y profesionales
-const coloresBordes = [
-    '#1c2b46', // Azul Naval Profundo
-    '#2d2d2d', // Grafito / Carbono
-    '#3e2723', // Marrón Café Oscuro
-    '#263238', // Pizarra Azulado
-    '#311b92', // Índigo Profundo
-    '#1b5e20', // Bosque Seco (Oscuro)
-    '#4a148c', // Púrpura Imperial
-    '#37474f'  // Acero Grisáceo
+import { showHistoryModal } from './modal.js';
+
+// =============================================
+// PALETA DE COLORES POR GRUPO
+// =============================================
+const COLORES_BORDE = [
+    '#1c2b46', // Azul Naval
+    '#2d2d2d', // Grafito
+    '#3e2723', // Marrón Café
+    '#263238', // Pizarra
+    '#311b92', // Índigo
+    '#1b5e20', // Bosque
+    '#4a148c', // Púrpura
+    '#37474f', // Acero
 ];
 
-// === PARAMETRIZACIÓN DE ALERTAS ===
-const PINGS_PARA_WARNING = 1; // Al primer ping perdido se pone amarillo
-const PINGS_PARA_ERROR   = 5; // A los 5 pings perdidos se pone rojo
+// Valores por defecto — se sobreescriben con lo que venga del JSON
+let META = { warning: 1, error: 5 };
 
+const mapaColores = {};
+let colorIdx = 0;
 
-function render(data) {
+// =============================================
+// RENDER
+// =============================================
+function render(hosts) {
     const dash = document.getElementById('dashboard');
     dash.innerHTML = '';
 
-    data.forEach(h => {
+    hosts.forEach(h => {
         const card = document.createElement('div');
-        const ipSplit = h.ip.split('.');
-        const ipCorta = `${ipSplit[2]}.${ipSplit[3]}`;
+        const [,, c, d] = h.ip.split('.');
 
-        card.style.borderLeftColor = obtenerColor(h.grupo);
-        
+        card.style.borderLeftColor = obtenerColorGrupo(h.grupo);
         card.innerHTML = `
             <div class="host-name">${h.nombre}</div>
-            <div class="host-time">${ipCorta} | ${formatearFecha(h.last_seen)}</div>
+            <div class="host-time">${c}.${d} | ${formatearFecha(h.last_seen)}</div>
         `;
 
-        // Lógica de colores parametrizada
-        if (h.missed === 0) {
+        // Lógica corregida: respeta ambos umbrales
+        if (h.missed < META.warning) {
             card.className = 'host-card status-verde';
-        } else if (h.missed < PINGS_PARA_ERROR) {
-            // Si hay fallos pero no llegamos al error total
+        } else if (h.missed < META.error) {
             card.className = 'host-card status-amarillo';
         } else {
-            // Si superamos el umbral de error
             card.className = 'host-card status-rojo';
         }
 
+        card.addEventListener('click', () => showHistoryModal(h));
         dash.appendChild(card);
     });
 }
 
-const mapaColores = {}; 
-let colorIdx = 0;
-
-function obtenerColor(grupo) {
+// =============================================
+// HELPERS
+// =============================================
+function obtenerColorGrupo(grupo) {
     if (!mapaColores[grupo]) {
-        mapaColores[grupo] = coloresBordes[colorIdx % coloresBordes.length];
+        mapaColores[grupo] = COLORES_BORDE[colorIdx % COLORES_BORDE.length];
         colorIdx++;
     }
     return mapaColores[grupo];
 }
 
 function formatearFecha(timestamp) {
-    if (timestamp === 0) return "--:--:--";
+    if (!timestamp) return '--:--:--';
     const fecha = new Date(timestamp * 1000);
-    const hoy = new Date();
-    const esHoy = fecha.toDateString() === hoy.toDateString();
-
-    const hora = fecha.toLocaleTimeString('es-AR', { 
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
-    });
-
-    return esHoy ? hora : `${fecha.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'})} ${hora}`;
+    const hora  = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    if (fecha.toDateString() === new Date().toDateString()) return hora;
+    return `${fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })} ${hora}`;
 }
 
+// =============================================
+// FETCH Y LOOP
+// =============================================
 async function fetchStatus() {
     try {
-        const response = await fetch('/json/status.json?t=' + Date.now());
-        const data = await response.json();
-        
-        data.sort((a, b) => {
-            if (a.grupo !== b.grupo) return a.grupo.localeCompare(b.grupo);
-            return a.nombre.localeCompare(b.nombre);
+        const res  = await fetch('/json/status.json?t=' + Date.now());
+        const json = await res.json();
+
+        // Leer umbrales desde el JSON (generados por config.sh → monitor.sh)
+        if (json.meta) META = json.meta;
+
+        const hosts = (json.hosts ?? json).sort((a, b) => {
+            const g = a.grupo.localeCompare(b.grupo);
+            return g !== 0 ? g : a.nombre.localeCompare(b.nombre);
         });
 
-        render(data);
-    } catch (e) { console.error("Error cargando JSON", e); }
+        render(hosts);
+    } catch (e) {
+        console.error('Error cargando status.json:', e);
+    }
 }
-
 
 fetchStatus();
 setInterval(fetchStatus, 3000);
