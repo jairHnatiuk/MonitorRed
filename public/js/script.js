@@ -22,9 +22,9 @@ let colorIdx = 0;
 // =============================================
 // TAMAÑO DE FUENTE — cookie
 // =============================================
-const FS_MIN  = 0.6;
-const FS_MAX  = 1.8;
-const FS_STEP = 0.1;
+const FS_MIN     = 0.6;
+const FS_MAX     = 1.8;
+const FS_STEP    = 0.1;
 const FS_DEFAULT = 1.0;
 
 function getCookie(name) {
@@ -61,7 +61,47 @@ function initFontControls() {
     document.getElementById('fs-minus').addEventListener('click', () => applyFontScale(fontScale - FS_STEP));
     document.getElementById('fs-plus' ).addEventListener('click', () => applyFontScale(fontScale + FS_STEP));
 
-    applyFontScale(fontScale); // aplica valor inicial y actualiza label
+    applyFontScale(fontScale);
+}
+
+// =============================================
+// LAYOUT GRID
+// Itera todas las opciones de columnas y elige
+// la que produce las tarjetas más grandes,
+// garantizando que TODAS entren en pantalla.
+// =============================================
+const GAP = 10;
+const PAD = 10;
+
+function calcGrid(n) {
+    const vw = window.innerWidth  - PAD * 2;
+    const vh = window.innerHeight - PAD * 2;
+
+    let bestCols = 1;
+    let bestArea = 0;
+
+    for (let cols = 1; cols <= n; cols++) {
+        const rows  = Math.ceil(n / cols);
+        const cardW = (vw - GAP * (cols - 1)) / cols;
+        const cardH = (vh - GAP * (rows - 1)) / rows;
+        // Solo cuenta si la tarjeta tiene dimensiones positivas
+        if (cardW <= 0 || cardH <= 0) continue;
+        const area = cardW * cardH;
+        if (area > bestArea) {
+            bestArea = area;
+            bestCols = cols;
+        }
+    }
+
+    return { cols: bestCols, rows: Math.ceil(n / bestCols) };
+}
+
+function applyGrid(n) {
+    const dash = document.getElementById('dashboard');
+    const { cols, rows } = calcGrid(n);
+    dash.style.display             = 'grid';
+    dash.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    dash.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
 }
 
 // =============================================
@@ -71,9 +111,10 @@ function render(hosts) {
     const dash = document.getElementById('dashboard');
     dash.innerHTML = '';
 
+    applyGrid(hosts.length);
+
     hosts.forEach(h => {
         const card = document.createElement('div');
-        const [,, c, d] = h.ip.split('.');
 
         card.style.borderLeftColor = obtenerColorGrupo(h.grupo);
         card.innerHTML = `
@@ -117,6 +158,8 @@ function formatearFecha(timestamp) {
 // =============================================
 // FETCH Y LOOP
 // =============================================
+let lastHostCount = 0;
+
 async function fetchStatus() {
     try {
         const res  = await fetch('/json/status.json?t=' + Date.now());
@@ -130,10 +173,15 @@ async function fetchStatus() {
         });
 
         render(hosts);
+        lastHostCount = hosts.length;
     } catch (e) {
         console.error('Error cargando status.json:', e);
     }
 }
+
+window.addEventListener('resize', () => {
+    if (lastHostCount > 0) applyGrid(lastHostCount);
+});
 
 initFontControls();
 fetchStatus();
