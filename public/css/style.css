@@ -1,259 +1,109 @@
-/* =============================================
-   BASE
-   ============================================= */
-body, html {
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #0a0a0c;
-    font-family: 'Segoe UI', Roboto, sans-serif;
+import { showHistoryModal } from './modal.js';
+import { aplicarLayout, iniciarBotonLayout } from './layout.js';
+
+// =============================================
+// PALETA DE COLORES POR GRUPO
+// =============================================
+const COLORES_BORDE = [
+    '#1c2b46', // Azul Naval
+    '#2d2d2d', // Grafito
+    '#3e2723', // Marrón Café
+    '#263238', // Pizarra
+    '#311b92', // Índigo
+    '#1b5e20', // Bosque
+    '#4a148c', // Púrpura
+    '#37474f', // Acero
+];
+
+let META = { warning: 1, error: 5 };
+
+const mapaColores = {};
+let colorIdx  = 0;
+let lastHosts = [];   // caché para redibujar sin re-fetch al cambiar layout
+
+// =============================================
+// RENDER
+// =============================================
+function render(hosts) {
+    const dash = document.getElementById('dashboard');
+    dash.innerHTML = '';
+
+    hosts.forEach(h => {
+        const card = document.createElement('div');
+        const [,, c, d] = h.ip.split('.');
+
+        card.style.borderLeftColor = obtenerColorGrupo(h.grupo);
+        card.innerHTML = `
+            <div class="host-name">${h.nombre}</div>
+            <div class="host-time">${c}.${d} | ${formatearFecha(h.last_seen)}</div>
+        `;
+
+        if (h.missed < META.warning) {
+            card.className = 'host-card status-verde';
+        } else if (h.missed < META.error) {
+            card.className = 'host-card status-amarillo';
+        } else {
+            card.className = 'host-card status-rojo';
+        }
+
+        card.addEventListener('click', () => showHistoryModal(h));
+        dash.appendChild(card);
+    });
+
+    aplicarLayout(dash, hosts.length);
 }
 
-/* El modal restaura el cursor normal */
-/*.modal-overlay, .modal-overlay * {
-    cursor: auto;
-}
-    */
-
-/* =============================================
-   DASHBOARD
-   ============================================= */
-#dashboard {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: stretch;
-    width: 100%;
-    height: 100%;
-    padding: 10px;
-    gap: 10px;
-    box-sizing: border-box;
+// =============================================
+// HELPERS
+// =============================================
+function obtenerColorGrupo(grupo) {
+    if (!mapaColores[grupo]) {
+        mapaColores[grupo] = COLORES_BORDE[colorIdx % COLORES_BORDE.length];
+        colorIdx++;
+    }
+    return mapaColores[grupo];
 }
 
-.host-card {
-    flex: 1 1 250px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
-    border-left: 18px solid transparent;
-    background-color: #1e1e26;
-    color: #ffffff;
-    text-align: center;
-    box-sizing: border-box;
-    padding: 15px;
-    transition: all 0.3s ease;
-    box-shadow: inset 5px 0 10px rgba(0,0,0,0.3);
-    min-height: 70px;
-    cursor: pointer;
+function formatearFecha(timestamp) {
+    if (!timestamp) return '--:--:--';
+    const fecha = new Date(timestamp * 1000);
+    const hora  = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    if (fecha.toDateString() === new Date().toDateString()) return hora;
+    return `${fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })} ${hora}`;
 }
 
-.host-card:hover {
-    filter: brightness(1.15);
-    transform: scale(1.01);
+// =============================================
+// FETCH Y LOOP
+// =============================================
+async function fetchStatus() {
+    try {
+        const res  = await fetch('/json/status.json?t=' + Date.now());
+        const json = await res.json();
+
+        if (json.meta) META = json.meta;
+
+        lastHosts = (json.hosts ?? json).sort((a, b) => {
+            const g = a.grupo.localeCompare(b.grupo);
+            return g !== 0 ? g : a.nombre.localeCompare(b.nombre);
+        });
+
+        render(lastHosts);
+    } catch (e) {
+        console.error('Error cargando status.json:', e);
+    }
 }
 
-.host-name {
-    font-weight: 800;
-    font-size: clamp(1.1rem, 2.3vmin, 2.8rem);
-    line-height: 1.1;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: -0.5px;
-}
+// =============================================
+// INIT
+// =============================================
 
-.host-time {
-    font-size: clamp(0.8rem, 1.4vmin, 1.6rem);
-    opacity: 0.9;
-    font-weight: 400;
-    font-family: 'Courier New', monospace;
-}
+// El botón llama a render con los datos en caché → sin re-fetch
+iniciarBotonLayout(() => render(lastHosts));
 
-/* =============================================
-   ESTADOS
-   ============================================= */
-.status-verde {
-    background-color: #1b5e20;
-    border-top: 1px solid #2e7d32;
-}
+// Recalcular layout si cambia el tamaño de la ventana
+window.addEventListener('resize', () => {
+    if (lastHosts.length) render(lastHosts);
+});
 
-.status-amarillo {
-    background-color: #b8860b;
-    color: #ffffff;
-}
-
-.status-rojo {
-    background-color: #8b0000;
-    color: #ffffff;
-    animation: pulse-red 2s infinite ease-in-out;
-}
-
-@keyframes pulse-red {
-    0%   { filter: brightness(1); }
-    50%  { filter: brightness(1.4); box-shadow: inset 0 0 20px rgba(255,0,0,0.3); }
-    100% { filter: brightness(1); }
-}
-
-/* =============================================
-   MODAL
-   ============================================= */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.modal-overlay.modal-visible {
-    opacity: 1;
-}
-
-.modal-box {
-    background: #1a1a24;
-    border: 1px solid #333;
-    border-radius: 10px;
-    width: 380px;
-    max-width: 95vw;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    transform: translateY(-10px);
-    transition: transform 0.2s ease;
-}
-
-.modal-overlay.modal-visible .modal-box {
-    transform: translateY(0);
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid #2a2a3a;
-    flex-shrink: 0;
-}
-
-.modal-titles {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.modal-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.modal-subtitle {
-    font-size: 0.8rem;
-    color: #888;
-    font-family: 'Courier New', monospace;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: color 0.2s, background 0.2s;
-    line-height: 1;
-}
-
-.modal-close:hover {
-    color: #fff;
-    background: #333;
-}
-
-.modal-body {
-    overflow-y: auto;
-    flex: 1;
-    padding: 12px 20px 20px;
-}
-
-.modal-empty {
-    color: #666;
-    font-size: 0.85rem;
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* Resumen de éxito */
-.h-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0 12px;
-    font-size: 0.8rem;
-    color: #aaa;
-    border-bottom: 1px solid #2a2a3a;
-    margin-bottom: 10px;
-}
-
-.h-pct {
-    font-weight: 700;
-    font-size: 0.9rem;
-}
-
-.pct-ok   { color: #4caf50; }
-.pct-warn { color: #ffc107; }
-.pct-err  { color: #ef5350; }
-
-/* Lista de pings */
-.h-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.h-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 10px;
-    border-radius: 5px;
-    font-size: 0.82rem;
-}
-
-.h-ok   { background: rgba(27, 94, 32, 0.35); }
-.h-fail { background: rgba(139, 0, 0, 0.35); }
-
-.h-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.h-ok   .h-dot { background: #4caf50; }
-.h-fail .h-dot { background: #ef5350; }
-
-.h-time {
-    flex: 1;
-    font-family: 'Courier New', monospace;
-    color: #ccc;
-}
-
-.h-status {
-    font-weight: 700;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-}
-
-.h-ok   .h-status { color: #66bb6a; }
-.h-fail .h-status { color: #ef5350; }
+fetchStatus();
+setInterval(fetchStatus, 3000);
