@@ -272,4 +272,4 @@ if __name__ == "__main__":
     print("Monitor corriendo en  http://0.0.0.0:3000")
     print("ABM de hosts en       http://0.0.0.0:3000/abm")
     # debug=False y threaded=True es adecuado para producción liviana
-    app.run(host="0.0.0.0", port=3000, debug=False, threaded=True)
+    app.run(host="0.0.0.0", port=8080, debug=False, threaded=True)
