@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABM Hosts — Network Monitor</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background: #0d0d14;
+    color: #d0d0e0;
+    min-height: 100vh;
+}
+
+/* ── Layout ── */
+header {
+    background: #13131e;
+    border-bottom: 1px solid #252535;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+header a {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: #666;
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    transition: color .15s, border-color .15s;
+}
+header a:hover { color: #aaa; border-color: #555; }
+
+main { max-width: 1100px; margin: 28px auto; padding: 0 20px 60px; }
+
+/* ── Toolbar ── */
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.toolbar input, .toolbar select {
+    background: #1a1a28;
+    border: 1px solid #333;
+    color: #d0d0e0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color .15s;
+}
+.toolbar input { flex: 1; min-width: 180px; }
+.toolbar input:focus, .toolbar select:focus { border-color: #555; }
+
+/* ── Botones ── */
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter .15s, opacity .15s;
+    white-space: nowrap;
+}
+.btn:hover  { filter: brightness(1.15); }
+.btn:active { filter: brightness(0.9); }
+.btn-primary  { background: #1d4ed8; color: #fff; }
+.btn-danger   { background: #7f1d1d; color: #fca5a5; }
+.btn-ghost    { background: #1e1e2e; border: 1px solid #333; color: #aaa; }
+.btn-sm       { padding: 5px 10px; font-size: 0.78rem; }
+.btn-icon     { width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+/* ── Tabla ── */
+.table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #252535; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+thead th {
+    background: #13131e;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: #888;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #252535;
+    white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid #1a1a28; transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #16161f; }
+tbody td { padding: 10px 14px; vertical-align: middle; }
+
+.ip-cell  { font-family: 'Courier New', monospace; color: #93c5fd; font-size: 0.82rem; }
+.name-cell { font-weight: 600; color: #f0f0ff; }
+.group-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: #1e2a3a;
+    color: #7dd3fc;
+    border: 1px solid #1e3a5f;
+}
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.status-on  { background: #14532d; color: #86efac; }
+.status-off { background: #292929; color: #777; }
+
+.actions { display: flex; gap: 6px; }
+
+/* ── Contador ── */
+.count-bar {
+    font-size: 0.78rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+.count-bar span { color: #888; font-weight: 600; }
+
+/* ── Modal ── */
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+.overlay.open { display: flex; }
+
+.modal {
+    background: #13131e;
+    border: 1px solid #2a2a40;
+    border-radius: 10px;
+    width: 420px;
+    max-width: 95vw;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+}
+.modal h2 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 20px; }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.78rem; color: #888; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.form-group input, .form-group select {
+    width: 100%;
+    background: #0d0d14;
+    border: 1px solid #333;
+    color: #d0d0e0;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color .15s;
+}
+.form-group input:focus, .form-group select:focus { border-color: #4b6cb7; }
+
+.form-row { display: flex; gap: 10px; }
+.form-row .form-group { flex: 1; }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+.error-msg {
+    background: #3b0a0a;
+    border: 1px solid #7f1d1d;
+    color: #fca5a5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+    display: none;
+}
+.error-msg.show { display: block; }
+
+/* ── Toast ── */
+#toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #1a2e1a;
+    border: 1px solid #2d5a2d;
+    color: #86efac;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+    z-index: 200;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.err  { background: #2e1a1a; border-color: #7f2d2d; color: #fca5a5; }
+
+/* ── Empty state ── */
+.empty { text-align: center; padding: 50px 20px; color: #444; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>⚙ Gestión de Hosts</h1>
+    <a href="/">← Volver al monitor</a>
+</header>
+
+<main>
+    <div class="toolbar">
+        <input type="text" id="search" placeholder="Buscar por IP, nombre o grupo…">
+        <select id="filter-grupo">
+            <option value="">Todos los grupos</option>
+        </select>
+        <select id="filter-activo">
+            <option value="">Todos</option>
+            <option value="1">Activos</option>
+            <option value="0">Deshabilitados</option>
+        </select>
+        <button class="btn btn-primary" onclick="abrirModalNuevo()">+ Nuevo host</button>
+    </div>
+
+    <div class="count-bar">Mostrando <span id="count">0</span> hosts</div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>IP / Host</th>
+                    <th>Nombre</th>
+                    <th>Grupo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="empty" style="display:none">No se encontraron hosts.</div>
+    </div>
+</main>
+
+<!-- Modal alta/edición -->
+<div class="overlay" id="overlay" onclick="cerrarModal(event)">
+    <div class="modal">
+        <h2 id="modal-title">Nuevo host</h2>
+        <div class="error-msg" id="form-error"></div>
+        <input type="hidden" id="edit-id">
+        <div class="form-row">
+            <div class="form-group">
+                <label>IP o Hostname</label>
+                <input type="text" id="f-ip" placeholder="192.168.1.10">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Nombre descriptivo</label>
+            <input type="text" id="f-nombre" placeholder="Servidor principal">
+        </div>
+        <div class="form-group">
+            <label>Grupo</label>
+            <input type="text" id="f-grupo" list="grupos-list" placeholder="Sistemas">
+            <datalist id="grupos-list"></datalist>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let todos = [];
+let grupos = [];
+
+// ── Fetch ──────────────────────────────────────────────────────────────────────
+async function cargar() {
+    const [rHosts, rGrupos] = await Promise.all([
+        fetch('/api/hosts').then(r => r.json()),
+        fetch('/api/hosts/grupos').then(r => r.json()),
+    ]);
+    todos  = rHosts.hosts  || [];
+    grupos = rGrupos.grupos || [];
+    actualizarFiltroGrupos();
+    renderTabla();
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function renderTabla() {
+    const q      = document.getElementById('search').value.toLowerCase();
+    const grupo  = document.getElementById('filter-grupo').value;
+    const activo = document.getElementById('filter-activo').value;
+
+    const filtrados = todos.filter(h => {
+        const matchQ = !q || h.ip.toLowerCase().includes(q)
+                           || h.nombre.toLowerCase().includes(q)
+                           || h.grupo.toLowerCase().includes(q);
+        const matchG = !grupo  || h.grupo === grupo;
+        const matchA = activo === '' || String(h.activo) === activo;
+        return matchQ && matchG && matchA;
+    });
+
+    const tbody = document.getElementById('tbody');
+    document.getElementById('count').textContent = filtrados.length;
+
+    if (filtrados.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('empty').style.display = '';
+        return;
+    }
+    document.getElementById('empty').style.display = 'none';
+
+    tbody.innerHTML = filtrados.map(h => `
+        <tr>
+            <td class="ip-cell">${esc(h.ip)}</td>
+            <td class="name-cell">${esc(h.nombre)}</td>
+            <td><span class="group-badge">${esc(h.grupo)}</span></td>
+            <td>
+                <span class="status-badge ${h.activo ? 'status-on' : 'status-off'}">
+                    ${h.activo ? 'Activo' : 'Deshabilitado'}
+                </span>
+            </td>
+            <td class="actions">
+                <button class="btn btn-ghost btn-sm btn-icon" title="Editar"
+                    onclick="abrirModalEditar(${h.id})">✏️</button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="${h.activo ? 'Deshabilitar' : 'Habilitar'}"
+                    onclick="toggleActivo(${h.id}, ${h.activo})">
+                    ${h.activo ? '⏸' : '▶'}
+                </button>
+                <button class="btn btn-danger btn-sm btn-icon" title="Eliminar"
+                    onclick="eliminar(${h.id}, '${esc(h.nombre)}')">🗑</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function actualizarFiltroGrupos() {
+    const sel = document.getElementById('filter-grupo');
+    const val = sel.value;
+    sel.innerHTML = '<option value="">Todos los grupos</option>'
+        + grupos.map(g => `<option value="${esc(g)}" ${g===val?'selected':''}>${esc(g)}</option>`).join('');
+
+    const dl = document.getElementById('grupos-list');
+    dl.innerHTML = grupos.map(g => `<option value="${esc(g)}">`).join('');
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────────
+function abrirModalNuevo() {
+    document.getElementById('modal-title').textContent = 'Nuevo host';
+    document.getElementById('edit-id').value = '';
+    document.getElementById('f-ip').value = '';
+    document.getElementById('f-nombre').value = '';
+    document.getElementById('f-grupo').value = '';
+    ocultarError();
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('f-ip').focus();
+}
+
+function abrirModalEditar(id) {
+    const h = todos.find(x => x.id === id);
+    if (!h) return;
+    document.getElementById('modal-title').textContent = 'Editar host';
+    document.getElementById('edit-id').value  = h.id;
+    document.getElementById('f-ip').value     = h.ip;
+    document.getElementById('f-nombre').value = h.nombre;
+    document.getElementById('f-grupo').value  = h.grupo;
+    ocultarError();
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('f-nombre').focus();
+}
+
+function cerrarModal(e) {
+    if (e && e.target !== document.getElementById('overlay')) return;
+    document.getElementById('overlay').classList.remove('open');
+}
+
+async function guardar() {
+    const id     = document.getElementById('edit-id').value;
+    const ip     = document.getElementById('f-ip').value.trim();
+    const nombre = document.getElementById('f-nombre').value.trim();
+    const grupo  = document.getElementById('f-grupo').value.trim();
+
+    if (!ip || !nombre || !grupo) {
+        mostrarError('Todos los campos son obligatorios.');
+        return;
+    }
+
+    const url    = id ? `/api/hosts/${id}` : '/api/hosts';
+    const method = id ? 'PUT' : 'POST';
+
+    const res  = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip, nombre, grupo }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) { mostrarError(data.error); return; }
+
+    document.getElementById('overlay').classList.remove('open');
+    toast(id ? 'Host actualizado.' : 'Host creado.');
+    await cargar();
+}
+
+// ── Acciones ───────────────────────────────────────────────────────────────────
+async function toggleActivo(id, actual) {
+    const res  = await fetch(`/api/hosts/${id}/activo`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activo: actual ? 0 : 1 }),
+    });
+    const data = await res.json();
+    if (!data.ok) { toast(data.error, true); return; }
+    toast(actual ? 'Host deshabilitado.' : 'Host habilitado.');
+    await cargar();
+}
+
+async function eliminar(id, nombre) {
+    if (!confirm(`¿Eliminar "${nombre}"?`)) return;
+    const res  = await fetch(`/api/hosts/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!data.ok) { toast(data.error, true); return; }
+    toast('Host eliminado.');
+    await cargar();
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function mostrarError(msg) {
+    const el = document.getElementById('form-error');
+    el.textContent = msg;
+    el.classList.add('show');
+}
+function ocultarError() {
+    document.getElementById('form-error').classList.remove('show');
+}
+
+let toastTimer;
+function toast(msg, err = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className   = 'show' + (err ? ' err' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.className = '', 2800);
+}
+
+// ── Eventos ────────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', renderTabla);
+document.getElementById('filter-grupo').addEventListener('change', renderTabla);
+document.getElementById('filter-activo').addEventListener('change', renderTabla);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+
+cargar();
+</script>
+</body>
+</html>
