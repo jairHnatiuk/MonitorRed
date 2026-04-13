@@ -9,7 +9,8 @@ Description=Script de Monitoreo de Red
 After=network.target
 
 [Service]
-ExecStart=/bin/bash /usr/local/monitorRed/monitor.sh
+#ExecStart=/bin/bash /usr/local/monitorRed/monitor.sh
+ExecStart=/bin/bash -c '/usr/local/monitorRed/monitor.sh >> /usr/local/monitorRed/logs/monitor.log 2>&1'
 WorkingDirectory=/usr/local/monitorRed
 StandardOutput=inherit
 StandardError=inherit
