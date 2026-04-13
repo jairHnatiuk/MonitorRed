@@ -94,13 +94,21 @@ def validar_host(ip, nombre, grupo):
     if not grupo or not grupo.strip():  raise ValueError("El grupo es obligatorio.")
 
 
+
 def leer_estado_pings():
     """Lee el JSON de estado que escribe el script bash."""
     try:
-        return json.loads(PING_STATE.read_text(encoding="utf-8"))
+        data = json.loads(PING_STATE.read_text(encoding="utf-8"))
+        
+        # El bash escribe {"hosts":[{ip, missed, last_seen, history},...]}
+        # Convertimos a dict indexado por IP para lookup rápido
+        if "hosts" in data:
+            return {h["ip"]: h for h in data["hosts"]}
+        
+        # Formato dict por IP (fallback)
+        return data
     except Exception:
         return {}
-
 
 def fail(msg, status=400):
     return jsonify({"ok": False, "error": msg}), status
@@ -269,7 +277,7 @@ def api_eliminar_host(host_id):
 
 if __name__ == "__main__":
     init_db()
-    print("Monitor corriendo en  http://0.0.0.0:3000")
-    print("ABM de hosts en       http://0.0.0.0:3000/abm")
+    print("Monitor corriendo en  http://0.0.0.0:8080")
+    print("ABM de hosts en       http://0.0.0.0:8080/abm")
     # debug=False y threaded=True es adecuado para producción liviana
     app.run(host="0.0.0.0", port=8080, debug=False, threaded=True)
