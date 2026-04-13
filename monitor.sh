@@ -3,7 +3,8 @@
 source "$(dirname "$0")/config.sh"
 
 CSV_FILE="$(dirname "$0")/hosts.csv"
-JSON_FILE="$(dirname "$0")/public/json/status.json"
+# JSON_FILE="$(dirname "$0")/public/json/status.json"
+JSON_FILE="$(dirname "$0")/data/ping_state.json"
 TMP_DIR=$(mktemp -d -p /dev/shm)
 
 declare -A missed_count
@@ -12,16 +13,26 @@ declare -A host_group
 declare -A last_seen
 
 # Leer hosts del CSV
-while IFS=',' read -r ip name group || [ -n "$ip" ]; do
-    [[ -z "$ip" || "$ip" == \#* ]] && continue
-    ip=$(echo "$ip"    | tr -d '\r ')
-    name=$(echo "$name"  | tr -d '\r')
-    group=$(echo "$group" | tr -d '\r')
+# while IFS=',' read -r ip name group || [ -n "$ip" ]; do
+#     [[ -z "$ip" || "$ip" == \#* ]] && continue
+#     ip=$(echo "$ip"    | tr -d '\r ')
+#     name=$(echo "$name"  | tr -d '\r')
+#     group=$(echo "$group" | tr -d '\r')
+#     missed_count["$ip"]=0
+#     host_name["$ip"]="$name"
+#     host_group["$ip"]="$group"
+#     last_seen["$ip"]=0
+# done < "$CSV_FILE"
+
+# AHORA
+DB_FILE="$(dirname "$0")/data/monitor.db"
+while IFS='|' read -r ip name group; do
+    [[ -z "$ip" ]] && continue
     missed_count["$ip"]=0
     host_name["$ip"]="$name"
     host_group["$ip"]="$group"
     last_seen["$ip"]=0
-done < "$CSV_FILE"
+done < <(sqlite3 "$DB_FILE" "SELECT ip,nombre,grupo FROM hosts WHERE activo=1")
 
 cleanup() {
     rm -rf "$TMP_DIR"
