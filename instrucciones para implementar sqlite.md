@@ -7,7 +7,8 @@ done < <(sqlite3 data/monitor.db "SELECT ip,nombre,grupo FROM hosts WHERE activo
 
 Y para arrancar, solo:
 
-bashpip3 install flask --break-system-packages
+bash
+pip3 install flask --break-system-packages
 python3 server.py
 
 # Migración a SQLite — Python / Flask
@@ -135,3 +136,11 @@ journalctl -u network-monitor -f
 - RAM en reposo: ~15–20 MB (vs ~8 MB de http.server)
 - CPU en idle: 0%
 - monitor.db con ~100 hosts: < 100 KB
+
+
+Tuve que ejecutar
+dos2unix config.sh
+para sacar los saltos de linea de windows
+
+sudo apt install sqlite3
+porque faltaba eso para el script monitor.sh
