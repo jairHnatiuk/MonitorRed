@@ -32,6 +32,11 @@ function getCookie(name) {
     return match ? parseFloat(decodeURIComponent(match[1])) : null;
 }
 
+function getCookieStr(name) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
 function setCookie(name, value) {
     const exp = new Date();
     exp.setFullYear(exp.getFullYear() + 2);
@@ -65,10 +70,60 @@ function initFontControls() {
 }
 
 // =============================================
+// FORMA DE CHIP — cookie
+// 'angosto' = chips altos y angostos (comportamiento original)
+// 'ancho'   = chips anchos y petisos
+// =============================================
+let modoChip = getCookieStr('chipMode') ?? 'angosto';
+
+const ICON_ANGOSTO = `
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="5" height="18" rx="1"/>
+  <rect x="10" y="3" width="5" height="18" rx="1"/>
+  <rect x="17" y="3" width="5" height="18" rx="1"/>
+</svg>`;
+
+const ICON_ANCHO = `
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3"  width="18" height="5" rx="1"/>
+  <rect x="3" y="10" width="18" height="5" rx="1"/>
+  <rect x="3" y="17" width="18" height="5" rx="1"/>
+</svg>`;
+
+function actualizarIconoChip(btn) {
+    // Muestra el ícono del modo al que VA a cambiar (no el actual)
+    if (modoChip === 'angosto') {
+        btn.innerHTML = ICON_ANCHO;
+        btn.title = 'Cambiar a chips anchos y petisos';
+    } else {
+        btn.innerHTML = ICON_ANGOSTO;
+        btn.title = 'Cambiar a chips altos y angostos';
+    }
+}
+
+function initChipToggle() {
+    const btn = document.createElement('button');
+    btn.id = 'chip-toggle';
+    document.body.appendChild(btn);
+    actualizarIconoChip(btn);
+
+    btn.addEventListener('click', () => {
+        modoChip = modoChip === 'angosto' ? 'ancho' : 'angosto';
+        setCookie('chipMode', modoChip);
+        actualizarIconoChip(btn);
+        if (lastHostCount > 0) applyGrid(lastHostCount);
+    });
+}
+
+// =============================================
 // LAYOUT GRID
 // Itera todas las opciones de columnas y elige
 // la que produce las tarjetas más grandes,
 // garantizando que TODAS entren en pantalla.
+// En modo 'ancho' se pondera además el aspect ratio
+// para favorecer chips anchos y petisos.
 // =============================================
 const GAP = 10;
 const PAD = 10;
@@ -78,7 +133,7 @@ function calcGrid(n) {
     const vh = window.innerHeight - PAD * 2;
 
     let bestCols = 1;
-    let bestArea = 0;
+    let bestScore = 0;
 
     for (let cols = 1; cols <= n; cols++) {
         const rows  = Math.ceil(n / cols);
@@ -87,8 +142,9 @@ function calcGrid(n) {
         // Solo cuenta si la tarjeta tiene dimensiones positivas
         if (cardW <= 0 || cardH <= 0) continue;
         const area = cardW * cardH;
-        if (area > bestArea) {
-            bestArea = area;
+        const score = modoChip === 'ancho' ? area * (cardW / cardH) : area;
+        if (score > bestScore) {
+            bestScore = score;
             bestCols = cols;
         }
     }
@@ -186,5 +242,6 @@ window.addEventListener('resize', () => {
 });
 
 initFontControls();
+initChipToggle();
 fetchStatus();
 setInterval(fetchStatus, 3000);

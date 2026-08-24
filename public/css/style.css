@@ -125,6 +125,35 @@ body, html {
 }
 
 /* =============================================
+   TOGGLE DE FORMA DE CHIP
+   ============================================= */
+#chip-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(20, 20, 30, 0.90);
+    border: 1px solid #444;
+    color: #ccc;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 28px rgba(0,0,0,0.6);
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+#chip-toggle:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.18);
+    border-color: #888;
+}
+
+/* =============================================
    ESTADOS
    ============================================= */
 .status-verde {
