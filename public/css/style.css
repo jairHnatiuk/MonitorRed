@@ -337,3 +337,80 @@ body, html {
 
 .h-ok   .h-status { color: #66bb6a; }
 .h-fail .h-status { color: #ef5350; }
+
+/* =============================================
+   MENU CONTEXTUAL
+   ============================================= */
+.ctx-menu {
+    position: fixed;
+    z-index: 2000;
+    background: #1a1a24;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    padding: 6px;
+    min-width: 190px;
+    display: none;
+}
+
+.ctx-menu.ctx-visible {
+    display: block;
+}
+
+.ctx-menu-item {
+    padding: 10px 14px;
+    border-radius: 5px;
+    color: #ddd;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ctx-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+/* =============================================
+   DIALOGO DE CONFIRMACION (reutiliza .modal-*)
+   ============================================= */
+.confirm-text {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin: 0 0 18px;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.confirm-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s, background 0.15s;
+}
+
+.confirm-btn-cancel {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ccc;
+}
+
+.confirm-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.confirm-btn-danger {
+    background: #8b0000;
+    border-color: #a00000;
+    color: #fff;
+}
+
+.confirm-btn-danger:hover {
+    filter: brightness(1.15);
+}

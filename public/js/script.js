@@ -1,4 +1,5 @@
 import { showHistoryModal } from './modal.js';
+import { initContextMenu } from './contextmenu.js';
 
 // =============================================
 // PALETA DE COLORES POR GRUPO
@@ -243,5 +244,6 @@ window.addEventListener('resize', () => {
 
 initFontControls();
 initChipToggle();
+initContextMenu();
 fetchStatus();
 setInterval(fetchStatus, 3000);
