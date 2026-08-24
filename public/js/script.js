@@ -119,17 +119,113 @@ function initChipToggle() {
 }
 
 // =============================================
+// GRILLA MANUAL (filas/columnas) — cookie
+// Si hay un valor manual guardado, tiene prioridad
+// sobre el cálculo automático de calcGrid().
+// =============================================
+const GRID_MIN = 1;
+const GRID_MAX = 20;
+
+function getManualGrid() {
+    const raw = getCookieStr('gridManual');
+    if (!raw) return null;
+    const [c, r] = raw.split('x').map(Number);
+    if (!Number.isInteger(c) || !Number.isInteger(r) || c < GRID_MIN || r < GRID_MIN) return null;
+    return { cols: c, rows: r };
+}
+
+function setManualGrid(cols, rows) {
+    setCookie('gridManual', `${cols}x${rows}`);
+}
+
+function clearManualGrid() {
+    setCookie('gridManual', '');
+}
+
+const ICON_GRID = `
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="7" height="7" rx="1"/>
+  <rect x="14" y="3" width="7" height="7" rx="1"/>
+  <rect x="3" y="14" width="7" height="7" rx="1"/>
+  <rect x="14" y="14" width="7" height="7" rx="1"/>
+</svg>`;
+
+function initGridControls() {
+    const toggle = document.createElement('button');
+    toggle.id = 'grid-toggle';
+    toggle.title = 'Configurar filas y columnas';
+    toggle.innerHTML = ICON_GRID;
+    document.body.appendChild(toggle);
+
+    const panel = document.createElement('div');
+    panel.id = 'grid-panel';
+    panel.innerHTML = `
+        <label>Columnas <input type="number" id="grid-cols-input" min="${GRID_MIN}" max="${GRID_MAX}" step="1"></label>
+        <label>Filas <input type="number" id="grid-rows-input" min="${GRID_MIN}" max="${GRID_MAX}" step="1"></label>
+        <div id="grid-panel-actions">
+            <button id="grid-auto-btn">Auto</button>
+            <button id="grid-apply-btn">Aplicar</button>
+        </div>
+    `;
+    document.body.appendChild(panel);
+
+    const colsInput = panel.querySelector('#grid-cols-input');
+    const rowsInput = panel.querySelector('#grid-rows-input');
+
+    function syncInputsToCurrent() {
+        const current = getManualGrid() ?? calcGrid(lastHostCount || 1);
+        colsInput.value = current.cols;
+        rowsInput.value = current.rows;
+    }
+
+    toggle.addEventListener('click', () => {
+        const opening = !panel.classList.contains('grid-panel-open');
+        if (opening) syncInputsToCurrent();
+        panel.classList.toggle('grid-panel-open');
+    });
+
+    panel.querySelector('#grid-apply-btn').addEventListener('click', () => {
+        let cols = Math.round(Number(colsInput.value));
+        let rows = Math.round(Number(rowsInput.value));
+        if (!Number.isFinite(cols) || !Number.isFinite(rows)) return;
+        cols = Math.min(GRID_MAX, Math.max(GRID_MIN, cols));
+        rows = Math.min(GRID_MAX, Math.max(GRID_MIN, rows));
+        setManualGrid(cols, rows);
+        panel.classList.remove('grid-panel-open');
+        if (lastHostCount > 0) applyGrid(lastHostCount);
+    });
+
+    panel.querySelector('#grid-auto-btn').addEventListener('click', () => {
+        clearManualGrid();
+        panel.classList.remove('grid-panel-open');
+        if (lastHostCount > 0) applyGrid(lastHostCount);
+    });
+
+    document.addEventListener('click', e => {
+        if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+            panel.classList.remove('grid-panel-open');
+        }
+    });
+}
+
+// =============================================
 // LAYOUT GRID
 // Itera todas las opciones de columnas y elige
 // la que produce las tarjetas más grandes,
 // garantizando que TODAS entren en pantalla.
 // En modo 'ancho' se pondera además el aspect ratio
 // para favorecer chips anchos y petisos.
+// Si hay una grilla manual guardada, se usa esa
+// directamente sin recalcular.
 // =============================================
 const GAP = 10;
 const PAD = 10;
 
 function calcGrid(n) {
+    const manual = getManualGrid();
+    if (manual) return manual;
+
     const vw = window.innerWidth  - PAD * 2;
     const vh = window.innerHeight - PAD * 2;
 
@@ -244,6 +340,7 @@ window.addEventListener('resize', () => {
 
 initFontControls();
 initChipToggle();
+initGridControls();
 initContextMenu();
 fetchStatus();
 setInterval(fetchStatus, 3000);

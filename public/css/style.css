@@ -154,6 +154,115 @@ body, html {
 }
 
 /* =============================================
+   TOGGLE + PANEL DE CONFIGURACION DE GRILLA
+   ============================================= */
+#grid-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 76px;
+    background: rgba(20, 20, 30, 0.90);
+    border: 1px solid #444;
+    color: #ccc;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 28px rgba(0,0,0,0.6);
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+#grid-toggle:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.18);
+    border-color: #888;
+}
+
+#grid-panel {
+    position: fixed;
+    bottom: 76px;
+    left: 20px;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 500;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 28px rgba(0,0,0,0.6);
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#grid-panel.grid-panel-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#grid-panel label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #ccc;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+#grid-panel input[type="number"] {
+    width: 56px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid #555;
+    color: #fff;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+#grid-panel-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+#grid-panel-actions button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255,255,255,0.06);
+    color: #ccc;
+    transition: filter 0.15s, background 0.15s;
+}
+
+#grid-panel-actions button:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+#grid-apply-btn {
+    background: #1b5e20;
+    border-color: #2e7d32;
+    color: #fff;
+}
+
+#grid-apply-btn:hover {
+    filter: brightness(1.15);
+}
+
+/* =============================================
    ESTADOS
    ============================================= */
 .status-verde {
